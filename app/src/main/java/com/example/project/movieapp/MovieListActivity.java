@@ -17,31 +17,8 @@ public class MovieListActivity extends AppCompatActivity {
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.fragment_container, MovieListFragment.newInstance());
         ft.commit();
-        new MovieFetchTask().execute();
 
     }
 
-    class MovieFetchTask extends AsyncTask<Void, Void, String>{
-        @Override
-        protected String doInBackground(Void... params) {
-            String jsonStr;
-            try{
-               jsonStr = new MovieAppClient().run();
-            }catch (Exception e){
-                Log.d("error", e.toString());
-                return null;
-            }
-            Log.d("json", jsonStr);
-            return jsonStr;
-        }
 
-        @Override
-        protected void onPostExecute(String s) {
-            if(s != null) {
-                Gson gson = new Gson();
-                MovieResponse movieResponse = gson.fromJson(s, MovieResponse.class);
-                Log.d("Size", "Size: " + movieResponse.getMovies().size());
-            }
-        }
-    }
 }
