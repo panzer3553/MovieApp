@@ -1,5 +1,6 @@
 package com.example.project.movieapp;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -7,6 +8,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.method.CharacterPickerDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +16,7 @@ import android.view.ViewGroup;
 
 import com.google.gson.Gson;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
@@ -22,7 +25,7 @@ import java.util.ArrayList;
 public class MovieListFragment extends Fragment {
     RecyclerView mRecyclerView;
     RecyclerView.LayoutManager mLayoutManager;
-    RecyclerView.Adapter mAdapter;
+    MovieAdapter mAdapter;
     ArrayList<Movie> movieList;
     public static MovieListFragment newInstance() {
 
@@ -48,6 +51,16 @@ public class MovieListFragment extends Fragment {
         mRecyclerView.setAdapter(mAdapter);
         // Set layout manager to position the items
         new MovieFetchTask().execute();
+        mAdapter.setOnItemClickListener(new MovieAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(View itemView, int position) {
+                Intent intent = new Intent(getActivity(), MovieDetail.class);
+                Gson gson = new Gson();
+                String jsonMovie = gson.toJson(movieList.get(position));
+                intent.putExtra("movie", jsonMovie);
+                startActivity(intent);
+            }
+        });
         return view;
     }
 
