@@ -17,9 +17,9 @@ public class MovieAppClient {
         client = new OkHttpClient();
     }
 
-    public String run() throws Exception {
+    public String run(String url) throws Exception {
         Request request = new Request.Builder()
-                .url("https://api.themoviedb.org/3/discover/movie?sort_by=popularity.desc&api_key=9d3ea725df2618aba8f2324d5015a4ea")
+                .url(url)
                 .build();
 
         Response response = client.newCall(request).execute();

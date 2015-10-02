@@ -27,6 +27,7 @@ public class MovieListFragment extends Fragment {
     RecyclerView.LayoutManager mLayoutManager;
     MovieAdapter mAdapter;
     ArrayList<Movie> movieList;
+    String url = "https://api.themoviedb.org/3/discover/movie?sort_by=popularity.desc&api_key=9d3ea725df2618aba8f2324d5015a4ea";
     public static MovieListFragment newInstance() {
 
         Bundle args = new Bundle();
@@ -69,12 +70,11 @@ public class MovieListFragment extends Fragment {
         protected String doInBackground(Void... params) {
             String jsonStr;
             try{
-                jsonStr = new MovieAppClient().run();
+                jsonStr = new MovieAppClient().run(url);
             }catch (Exception e){
                 Log.d("error", e.toString());
                 return null;
             }
-            Log.d("json", jsonStr);
             return jsonStr;
         }
 

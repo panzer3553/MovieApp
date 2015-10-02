@@ -6,6 +6,7 @@ import com.google.gson.annotations.SerializedName;
  * Created by hoang on 01/10/2015.
  */
 public class Movie {
+    private String id;
     @SerializedName("title")
     private String title;
     @SerializedName("overview")
@@ -17,12 +18,19 @@ public class Movie {
     @SerializedName("poster_path")
     private String image_path;
 
-    public Movie(String title, String overview, String release_date, String image_path, double score) {
+
+    public Movie(String id, String title, String overview, String release_date, String image_path, double score) {
+        this.id = id;
+
         this.title = title;
         this.overview = overview;
         this.release_date = release_date;
         this.image_path = image_path;
         this.score = score;
+    }
+
+    public String getId() {
+        return id;
     }
 
     public String getTitle() {
