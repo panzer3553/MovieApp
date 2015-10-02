@@ -14,8 +14,10 @@ public class MovieListActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        String url = new MovieUrlBuilder().buildSearchQueryPathBaseOnPopularity();
+        Log.d("main url", url);
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        ft.replace(R.id.fragment_container, MovieListFragment.newInstance());
+        ft.replace(R.id.fragment_container, MovieListFragment.newInstance(url));
         ft.commit();
 
     }

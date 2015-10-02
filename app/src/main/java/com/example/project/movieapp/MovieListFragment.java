@@ -28,11 +28,10 @@ public class MovieListFragment extends Fragment {
     MovieAdapter mAdapter;
     View progressContainer;
     ArrayList<Movie> movieList;
-    String url = "https://api.themoviedb.org/3/discover/movie?sort_by=popularity.desc&api_key=9d3ea725df2618aba8f2324d5015a4ea";
-    public static MovieListFragment newInstance() {
+    public static MovieListFragment newInstance(String url) {
 
         Bundle args = new Bundle();
-
+        args.putString("url", url);
         MovieListFragment fragment = new MovieListFragment();
         fragment.setArguments(args);
         return fragment;
@@ -41,6 +40,7 @@ public class MovieListFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.movie_list_fragment, container, false);
+        String url = getArguments().getString("url");
         mRecyclerView = (RecyclerView) view.findViewById(R.id.listView);
         movieList = new ArrayList<>();
         // Create adapter passing in the sample user data
@@ -53,7 +53,7 @@ public class MovieListFragment extends Fragment {
         mRecyclerView.setAdapter(mAdapter);
         progressContainer = view.findViewById(R.id.progressBar_list_container);
         // Set layout manager to position the items
-        new MovieFetchTask().execute();
+        new MovieFetchTask().execute(url);
         mAdapter.setOnItemClickListener(new MovieAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View itemView, int position) {
@@ -67,12 +67,12 @@ public class MovieListFragment extends Fragment {
         return view;
     }
 
-    class MovieFetchTask extends AsyncTask<Void, Void, String> {
+    class MovieFetchTask extends AsyncTask<String, Void, String> {
         @Override
-        protected String doInBackground(Void... params) {
+        protected String doInBackground(String... params) {
             String jsonStr;
             try{
-                jsonStr = new MovieAppClient().run(url);
+                jsonStr = new MovieAppClient().run(params[0]);
             }catch (Exception e){
                 Log.d("error", e.toString());
                 return null;

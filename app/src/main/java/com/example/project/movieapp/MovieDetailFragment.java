@@ -74,7 +74,6 @@ public class MovieDetailFragment extends Fragment {
         //Start new thread
         FetchTrailerTask task = new FetchTrailerTask();
         task.execute(movie.getId());
-        setRetainInstance(true);
         return view;
     }
 
@@ -146,6 +145,7 @@ public class MovieDetailFragment extends Fragment {
 
         public void addTrailerView(){
             LayoutInflater vi = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            Log.d("vi", "Null " + Boolean.toString(vi == null));
             for (int i = 0; i < trailerVideo.size(); i++) {
                 View trailerView = vi.inflate(R.layout.trailer_view, null);
                 final TextView trailerTitleView = (TextView) trailerView.findViewById(R.id.trailer_title);
