@@ -7,8 +7,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -33,7 +35,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
         // for any view that will be set as you render a row
         public ImageView imageItem;
         public TextView titleItem;
-
+        public View progressBarContainer;
         // We also create a constructor that accepts the entire item row
         // and does the view lookups to find each subview
         public ViewHolder(final View itemView) {
@@ -43,6 +45,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
 
             imageItem = (ImageView) itemView.findViewById(R.id.image_row);
             titleItem = (TextView) itemView.findViewById(R.id.title_row);
+            progressBarContainer = (View) itemView.findViewById(R.id.progress_container);
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -76,14 +79,24 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
 
     // Involves populating data into the item through holder
     @Override
-    public void onBindViewHolder(MovieAdapter.ViewHolder viewHolder, int position) {
+    public void onBindViewHolder(MovieAdapter.ViewHolder viewHolder, final int position) {
         // Get the data model based on position
         Movie movie = mMovies.get(position);
-
+        final View progressBarContainer = viewHolder.progressBarContainer;
         // Set item views based on the data model
-        ImageView textView = viewHolder.imageItem;
+        ImageView imageView = viewHolder.imageItem;
         String url = "http://image.tmdb.org/t/p/w185/" + movie.getimage_path();
-        Picasso.with(mContext).load(url).into(textView);
+        Picasso.with(mContext).load(url).into(imageView, new Callback() {
+            @Override
+            public void onSuccess() {
+                progressBarContainer.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onError() {
+                progressBarContainer.setVisibility(View.GONE);
+            }
+        });
         TextView titleView = viewHolder.titleItem;
         titleView.setText(movie.getTitle());
 
