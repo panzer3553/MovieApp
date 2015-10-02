@@ -26,6 +26,7 @@ public class MovieListFragment extends Fragment {
     RecyclerView mRecyclerView;
     RecyclerView.LayoutManager mLayoutManager;
     MovieAdapter mAdapter;
+    View progressContainer;
     ArrayList<Movie> movieList;
     String url = "https://api.themoviedb.org/3/discover/movie?sort_by=popularity.desc&api_key=9d3ea725df2618aba8f2324d5015a4ea";
     public static MovieListFragment newInstance() {
@@ -50,6 +51,7 @@ public class MovieListFragment extends Fragment {
         mAdapter = new MovieAdapter(getActivity(), movieList);
         // Attach the adapter to the recyclerview to populate items
         mRecyclerView.setAdapter(mAdapter);
+        progressContainer = view.findViewById(R.id.progressBar_list_container);
         // Set layout manager to position the items
         new MovieFetchTask().execute();
         mAdapter.setOnItemClickListener(new MovieAdapter.OnItemClickListener() {
@@ -89,6 +91,7 @@ public class MovieListFragment extends Fragment {
                     movieList.add(movie);
                 }
                 mAdapter.notifyDataSetChanged();
+                progressContainer.setVisibility(View.GONE);
             }
         }
     }

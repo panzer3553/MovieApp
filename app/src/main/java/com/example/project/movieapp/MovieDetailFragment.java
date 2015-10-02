@@ -34,7 +34,9 @@ public class MovieDetailFragment extends Fragment {
     TextView titleView, releaseYearView, scoreView, overviewView;
     ImageView imagePoster;
     ArrayList<Trailer> trailerVideo;
-    ViewGroup insertPoint;
+    ArrayList<Review> reviewsList;
+    ViewGroup insertTrailerPoint;
+    ViewGroup insertReviewPoint;
 
     public static MovieDetailFragment newInstance(String jsonMovie) {
         Bundle args = new Bundle();
@@ -54,8 +56,10 @@ public class MovieDetailFragment extends Fragment {
         scoreView = (TextView) view.findViewById(R.id.score);
         overviewView = (TextView) view.findViewById(R.id.overview);
         imagePoster = (ImageView) view.findViewById(R.id.image);
-        insertPoint = (ViewGroup) view.findViewById(R.id.insert_point);
+        insertTrailerPoint = (ViewGroup) view.findViewById(R.id.insert_trailer_point);
+        insertReviewPoint = (ViewGroup) view.findViewById(R.id.insert_review_point);
         trailerVideo = new ArrayList<>();
+        reviewsList = new ArrayList<>();
         //Parse json movie from intent extra
         Gson gson = new Gson();
         String jsonMovie = getArguments().getString("movie");
@@ -70,6 +74,7 @@ public class MovieDetailFragment extends Fragment {
         //Start new thread
         FetchTrailerTask task = new FetchTrailerTask();
         task.execute(movie.getId());
+        setRetainInstance(true);
         return view;
     }
 
@@ -78,10 +83,9 @@ public class MovieDetailFragment extends Fragment {
         protected String doInBackground(String... params) {
             String jsonStr;
             try {
-                String url = "https://api.themoviedb.org/3/movie/" + params[0]
-                        + "?api_key=9d3ea725df2618aba8f2324d5015a4ea&append_to_response=trailers";
-
-                jsonStr = new MovieAppClient().run(url);
+                String trailerURL = new MovieUrlBuilder().buildMoviePath(params[0]);
+                Log.d("url", trailerURL);
+                jsonStr = new MovieAppClient().run(trailerURL);
             } catch (Exception e) {
                 Log.d("Error 1", e.toString());
                 return null;
@@ -92,7 +96,13 @@ public class MovieDetailFragment extends Fragment {
         @Override
         protected void onPostExecute(String s) {
             parseJsonTrailer(s);
-            addTrailerView();
+            if(trailerVideo.size() > 0){
+                addTrailerView();
+            }
+            parseJsonReview(s);
+            if(reviewsList.size() > 0){
+                addReviewView();
+            }
 
         }
 
@@ -115,6 +125,25 @@ public class MovieDetailFragment extends Fragment {
             }
         }
 
+        public void parseJsonReview(String jsonStr) {
+            if (jsonStr != null) {
+                try {
+                    JSONObject jsonObject = new JSONObject(jsonStr);
+                    JSONObject reviews = jsonObject.getJSONObject("reviews");
+                    JSONArray results = reviews.getJSONArray("results");
+                    for (int i = 0; i < results.length(); i++) {
+                        JSONObject reviewJsonObject = results.getJSONObject(i);
+                        String author = reviewJsonObject.getString("author");
+                        String content = reviewJsonObject.getString("content");
+                        reviewsList.add(new Review(author, content));
+                    }
+                } catch (JSONException e) {
+                    Log.d("error", e.toString());
+                }
+                Log.d("review", "size: " + reviewsList.size());
+            }
+        }
+
         public void addTrailerView(){
             LayoutInflater vi = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             for (int i = 0; i < trailerVideo.size(); i++) {
@@ -132,7 +161,20 @@ public class MovieDetailFragment extends Fragment {
 
                     }
                 });
-                insertPoint.addView(trailerView, 0, new ViewGroup.LayoutParams
+                insertTrailerPoint.addView(trailerView, 0, new ViewGroup.LayoutParams
+                        (ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+            }
+        }
+
+        public void addReviewView(){
+            LayoutInflater vi = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            for (int i = 0; i < reviewsList.size(); i++) {
+                View reviewView = vi.inflate(R.layout.review_view, null);
+                TextView authourView = (TextView)reviewView.findViewById(R.id.author_name);
+                authourView.setText(reviewsList.get(i).author);
+                TextView contentView = (TextView)reviewView.findViewById(R.id.review_content);
+                contentView.setText(reviewsList.get(i).content);
+                insertReviewPoint.addView(reviewView, 0, new ViewGroup.LayoutParams
                         (ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
             }
         }
